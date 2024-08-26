@@ -1,0 +1,11 @@
+name: ExTestEnv
+channels:
+  - anaconda
+  - defaults
+dependencies:
+  - pip=24.0
+  - pytest=7.4.0
+  - python=3.10.14
+  - setuptools=69.5.1
+  - sqlite=3.45.3
+prefix: C:\ProgramData\Miniconda3\envs\ExTestEnv
