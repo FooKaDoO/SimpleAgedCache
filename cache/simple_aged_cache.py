@@ -27,8 +27,19 @@ class SimpleAgedCache:
         """
         def is_expired(self, curr_time: datetime):
             return self.expiration_time <= curr_time
-    
-    
+
+    """
+    Decorator for removing expired ExpirableEntry objects from SimpleAgedCache priority queue.
+    """
+    def clean_expired(function):
+        def wrapper(*args, **kwargs):
+            cache = args[0]
+            while cache.head != None and cache.head.is_expired(cache.clock()):
+                cache.head = cache.head.next
+                cache.length -= 1
+            return function(*args, **kwargs)
+        return wrapper
+
     """
     Initializes a SimpleAgedCache priority queue.
 
@@ -40,13 +51,13 @@ class SimpleAgedCache:
         self.head: self.ExpirableEntry = None
         self.length: int = 0
 
-
     """
     Inserts a key-value pair into the SimpleAgedCache object.
 
     Parameters: key, value, retention_in_millis.
     retention_in_millis is the time the object is retained before cleaned up.
     """
+    @clean_expired
     def put(self, 
             key, value, 
             retention_in_millis: int):
@@ -67,12 +78,14 @@ class SimpleAgedCache:
     """
     Returns True or False according to if the SimpleAgedCache object is empty.
     """
+    @clean_expired
     def is_empty(self):
         return self.head is None
 
     """
     Returns the size of SimpleAgedCache.
     """
+    @clean_expired
     def size(self):
         return self.length
 
@@ -82,6 +95,7 @@ class SimpleAgedCache:
 
     Parameters: key.
     """
+    @clean_expired
     def get(self, key):
         elem = self.head
         while elem != None:
@@ -89,23 +103,3 @@ class SimpleAgedCache:
                 return elem.value
             elem = elem.next
         return None
-    
-    """
-    Removes expired ExpirableEntry objects from SimpleAgedCache priority queue.
-    """
-    def clean_expired(self):
-        while self.head != None and self.head.is_expired(self.clock()):
-            self.head = self.head.next
-            self.length -= 1
-    
-    """
-    Overwrite __getattribute__(self, name) so that it runs
-    clean_expired on certain methods.
-    
-    Inspiration: https://stackoverflow.com/a/77186322
-    """
-    def __getattribute__(self, name):
-        if name in ("put", "get", 
-                    "is_empty", "size"):
-            super().__getattribute__('clean_expired')()
-        return super().__getattribute__(name)
