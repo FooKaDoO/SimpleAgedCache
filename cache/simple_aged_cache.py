@@ -50,7 +50,6 @@ class SimpleAgedCache:
     def put(self, 
             key, value, 
             retention_in_millis: int):
-        self.clean_expired()
         
         new_elem: self.ExpirableEntry = self.ExpirableEntry(key, value, self.clock() + timedelta(milliseconds=retention_in_millis))
         curr_elem: self.ExpirableEntry = self.head
@@ -85,7 +84,6 @@ class SimpleAgedCache:
     Parameters: key.
     """
     def get(self, key):
-        self.clean_expired()
         elem = self.head
         while elem != None:
             if elem.key == key:
