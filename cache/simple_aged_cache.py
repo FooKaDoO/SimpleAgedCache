@@ -70,28 +70,17 @@ class SimpleAgedCache:
     Returns True or False according to if the SimpleAgedCache object is empty.
     """
     def is_empty(self):
-        return self.size() == 0
+        return self.head is None
 
     """
     Returns the size of SimpleAgedCache.
-    Removes expired elements.
     """
     def size(self):
-        self.clean_expired()
         return self.length
-
-    """
-    Removes expired ExpirableEntry objects from SimpleAgedCache priority queue.
-    """
-    def clean_expired(self):
-        while self.head != None and self.head.is_expired(self.clock()):
-            self.head = self.head.next
-            self.length -= 1
 
     """
     Returns the value for the given key.
     If there is no object with given key, returns None.
-    Removes expired elements.
 
     Parameters: key.
     """
@@ -103,3 +92,21 @@ class SimpleAgedCache:
                 return elem.value
             elem = elem.next
         return None
+    
+    """
+    Removes expired ExpirableEntry objects from SimpleAgedCache priority queue.
+    """
+    def clean_expired(self):
+        while self.head != None and self.head.is_expired(self.clock()):
+            self.head = self.head.next
+            self.length -= 1
+    
+    """
+    Overwrite __getattribute__(self, name) so that it runs
+    clean_expired on certain methods.
+    """
+    def __getattribute__(self, name):
+        if name in ("put", "get", 
+                    "is_empty", "size"):
+            super().__getattribute__('clean_expired')()
+        return super().__getattribute__(name)
