@@ -102,6 +102,8 @@ class SimpleAgedCache:
     """
     Overwrite __getattribute__(self, name) so that it runs
     clean_expired on certain methods.
+    
+    Inspiration: https://stackoverflow.com/a/77186322
     """
     def __getattribute__(self, name):
         if name in ("put", "get", 
