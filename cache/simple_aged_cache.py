@@ -50,7 +50,6 @@ class SimpleAgedCache:
     def put(self, 
             key, value, 
             retention_in_millis: int):
-        
         new_elem: self.ExpirableEntry = self.ExpirableEntry(key, value, self.clock() + timedelta(milliseconds=retention_in_millis))
         curr_elem: self.ExpirableEntry = self.head
         prev_elem: self.ExpirableEntry = None
