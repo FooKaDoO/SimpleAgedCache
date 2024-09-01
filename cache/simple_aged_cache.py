@@ -33,7 +33,7 @@ class SimpleAgedCache:
     """
     def clean_expired(function):
         def wrapper(*args, **kwargs):
-            cache = args[0]
+            cache = args[0] # args[0] is self
             while cache.head != None and cache.head.is_expired(cache.clock()):
                 cache.head = cache.head.next
                 cache.length -= 1
